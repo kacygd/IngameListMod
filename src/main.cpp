@@ -13,16 +13,16 @@ class $modify(LevelInfoLayer) {
 
         WebRequest()
             .get(url)
-            .json([this](std::optional<matjson::Value> result) { // Dùng json() thay vì text()
-                if (result.has_value() && result->is_number()) { // Kiểm tra nếu kết quả là số
-                    int rank = result->as<int>(); // Chuyển thành số nguyên
+            .text([this](std::string const& body) {
+                if (body.find("Error") == std::string::npos) {
+                    int rank = std::stoi(body);
                     
                     auto rankLabel = CCLabelBMFont::create(
                         ("Rank: " + std::to_string(rank)).c_str(),
                         "bigFont.fnt"
                     );
                     rankLabel->setPosition(100, 150);
-                    CCDirector::sharedDirector()->getRunningScene()->addChild(rankLabel);
+                    this->addChild(rankLabel);
                 }
             });
 
