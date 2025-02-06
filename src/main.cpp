@@ -13,8 +13,7 @@ class $modify(LevelInfoLayer) {
 
         WebRequest()
             .get(url)
-            .into_string()  // Thay thế text() bằng into_string()
-            .then([this](std::string body) {
+            .text([](std::string body) {  // Sử dụng text() với callback
                 if (body.find("Error") == std::string::npos) {
                     int rank = std::stoi(body);
                     
@@ -23,7 +22,7 @@ class $modify(LevelInfoLayer) {
                         "bigFont.fnt"
                     );
                     rankLabel->setPosition(100, 150);
-                    this->addChild(rankLabel);
+                    CCDirector::sharedDirector()->getRunningScene()->addChild(rankLabel);
                 }
             });
 
