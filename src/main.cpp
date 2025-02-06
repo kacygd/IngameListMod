@@ -5,18 +5,19 @@
 using namespace geode::prelude;
 
 class $modify(LevelInfoLayer) {
-    bool init(GJGameLevel* level) {
-        if (!LevelInfoLayer::init(level)) return false;
+    bool init(GJGameLevel* level, bool challenge) { // Truyền đủ 2 tham số
+        if (!LevelInfoLayer::init(level, challenge)) return false;
 
         std::string url = "https://cps.ps.fhgdps.com/database/demonlist.php?levelID=" + std::to_string(level->m_levelID);
 
-        geode::utils::web::AsyncWebRequest::get(url, [this](const geode::utils::web::Response& response) {
-            if (response.isSuccessful()) {
-                std::string body = response.getBody();
-                
-                // Kiểm tra nếu dữ liệu là số (rank)
+        // Sử dụng WebRequest thay vì AsyncWebRequest
+        WebRequest()
+            .get(url)
+            .text() // Đọc dữ liệu dạng text
+            .then([this](std::string body) {
+                // Kiểm tra nếu dữ liệu hợp lệ
                 if (body.find("Error") == std::string::npos) {
-                    int rank = std::stoi(body); // Chuyển từ string sang số nguyên
+                    int rank = std::stoi(body); // Chuyển từ chuỗi sang số nguyên
                     
                     // Hiển thị rank trong level
                     auto rankLabel = CCLabelBMFont::create(
@@ -26,8 +27,7 @@ class $modify(LevelInfoLayer) {
                     rankLabel->setPosition(100, 150); // Điều chỉnh vị trí phù hợp
                     this->addChild(rankLabel);
                 }
-            }
-        });
+            });
 
         return true;
     }
