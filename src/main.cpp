@@ -16,7 +16,7 @@ class $modify(LevelInfoLayer) {
             .get(url)
             .then([this](geode::utils::web::WebResponse response) {
                 // Kiểm tra nếu dữ liệu hợp lệ (chỉ chứa số)
-                std::string body = response.body(); // Assuming this is how to get the body
+                std::string body = response.getBody(); // Cập nhật phương thức để lấy body
                 if (!body.empty() && std::all_of(body.begin(), body.end(), ::isdigit)) {
                     int rank = std::stoi(body);
 
