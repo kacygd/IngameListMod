@@ -14,8 +14,9 @@ class $modify(LevelInfoLayer) {
         // Gửi yêu cầu web để lấy rank của level
         WebRequest()
             .get(url)
-            .text([this](std::string const& body) {
+            .then([this](geode::utils::web::WebResponse response) {
                 // Kiểm tra nếu dữ liệu hợp lệ (chỉ chứa số)
+                std::string body = response.body(); // Assuming this is how to get the body
                 if (!body.empty() && std::all_of(body.begin(), body.end(), ::isdigit)) {
                     int rank = std::stoi(body);
 
