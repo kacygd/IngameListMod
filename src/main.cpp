@@ -16,19 +16,18 @@ class $modify(LevelInfoLayer) {
             .get(url)
             .then([this](geode::utils::web::WebResponse response) {
                 // Kiểm tra nếu dữ liệu hợp lệ (chỉ chứa số)
-                response.text([this](std::string const& body) {
-                    if (!body.empty() && std::all_of(body.begin(), body.end(), ::isdigit)) {
-                        int rank = std::stoi(body);
+                std::string body = response.getBody(); // Cập nhật phương thức để lấy body
+                if (!body.empty() && std::all_of(body.begin(), body.end(), ::isdigit)) {
+                    int rank = std::stoi(body);
 
-                        // Hiển thị rank trên UI
-                        auto rankLabel = CCLabelBMFont::create(
-                            ("Rank: " + std::to_string(rank)).c_str(),
-                            "bigFont.fnt"
-                        );
-                        rankLabel->setPosition(100, 150); // Điều chỉnh vị trí nếu cần
-                        this->addChild(rankLabel);
-                    }
-                });
+                    // Hiển thị rank trên UI
+                    auto rankLabel = CCLabelBMFont::create(
+                        ("Rank: " + std::to_string(rank)).c_str(),
+                        "bigFont.fnt"
+                    );
+                    rankLabel->setPosition(100, 150); // Điều chỉnh vị trí nếu cần
+                    this->addChild(rankLabel);
+                }
             });
 
         return true;
