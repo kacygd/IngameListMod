@@ -11,17 +11,20 @@ class $modify(LevelInfoLayer) {
 
         std::string url = "https://cps.ps.fhgdps.com/database/demonlist.php?levelID=" + std::to_string(level->m_levelID);
 
+        // Gửi yêu cầu web để lấy rank của level
         WebRequest()
             .get(url)
             .text([this](std::string const& body) {
-                if (body.find("Error") == std::string::npos) {
+                // Kiểm tra nếu dữ liệu hợp lệ (chỉ chứa số)
+                if (!body.empty() && std::all_of(body.begin(), body.end(), ::isdigit)) {
                     int rank = std::stoi(body);
-                    
+
+                    // Hiển thị rank trên UI
                     auto rankLabel = CCLabelBMFont::create(
                         ("Rank: " + std::to_string(rank)).c_str(),
                         "bigFont.fnt"
                     );
-                    rankLabel->setPosition(100, 150);
+                    rankLabel->setPosition(100, 150); // Điều chỉnh vị trí nếu cần
                     this->addChild(rankLabel);
                 }
             });
