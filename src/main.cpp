@@ -3,6 +3,7 @@
 #include <Geode/utils/web.hpp>
 
 using namespace geode::prelude;
+using geode::utils::web::WebRequest; // Thêm dòng này để sử dụng WebRequest
 
 class $modify(LevelInfoLayer) {
     bool init(GJGameLevel* level, bool challenge) { // Truyền đủ 2 tham số
@@ -10,16 +11,14 @@ class $modify(LevelInfoLayer) {
 
         std::string url = "https://cps.ps.fhgdps.com/database/demonlist.php?levelID=" + std::to_string(level->m_levelID);
 
-        // Sử dụng WebRequest thay vì AsyncWebRequest
+        // Sử dụng WebRequest với đầy đủ namespace
         WebRequest()
             .get(url)
             .text() // Đọc dữ liệu dạng text
             .then([this](std::string body) {
-                // Kiểm tra nếu dữ liệu hợp lệ
                 if (body.find("Error") == std::string::npos) {
-                    int rank = std::stoi(body); // Chuyển từ chuỗi sang số nguyên
+                    int rank = std::stoi(body);
                     
-                    // Hiển thị rank trong level
                     auto rankLabel = CCLabelBMFont::create(
                         ("Rank: " + std::to_string(rank)).c_str(),
                         "bigFont.fnt"
