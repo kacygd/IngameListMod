@@ -50,11 +50,11 @@ void infoButton(CCLayer* layer, CCLabelBMFont* label, bool internetFail = false)
 }
 
 void DemonClass::showInfoBox(CCObject* sender) {
-    FLAlertLayer::create("Thông tin vị trí N/A", "Mức độ này chưa bao giờ được xếp hạng hoặc chưa được đặt trên danh sách.", "OK")->show();
+    FLAlertLayer::create("Position information N/A", "This level has never been rated or placed on the list.", "OK")->show();
 }
 
 void DemonClass::showInternetFail(CCObject* sender) {
-    FLAlertLayer::create("Lỗi kết nối", "Không thể tìm thấy thứ hạng của mức độ này. Vui lòng kiểm tra kết nối Internet của bạn.", "OK")->show();
+    FLAlertLayer::create("Connection error", "Cannot find a rating for this level. Please check your Internet connection.", "OK")->show();
 }
 
 void getRequest(CCLayer* self, GJGameLevel* level, CCLabelBMFont* label) {
