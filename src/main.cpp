@@ -34,7 +34,7 @@ void createButton(CCLayer* self, CCLabelBMFont* label, int levelID) {
 
 void DemonClass::openLink(CCObject* ret) {
     int levelID = static_cast<CCInteger*>(static_cast<CCNode*>(ret)->getUserObject())->getValue();
-    std::string url = "https://cps.ps.fhgdps.com/level/" + std::to_string(levelID);
+    std::string url = "https://cps.ps.fhgdps.com/database/data/levels/" + std::to_string(levelID);
     web::openLinkInBrowser(url.c_str());
 }
 
