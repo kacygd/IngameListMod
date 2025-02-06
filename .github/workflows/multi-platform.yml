@@ -29,6 +29,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set GEODE_SDK environment variable
+        run: echo "GEODE_SDK=/home/runner/work/IngameListMod/IngameListMod/geode-sdk-clone" >> $GITHUB_ENV
+
       - name: Build the mod
         uses: geode-sdk/build-geode-mod@main
         with:
