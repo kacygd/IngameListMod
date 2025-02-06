@@ -6,14 +6,17 @@
 using namespace geode::prelude;
 
 std::unordered_map<int, int> cachedPositions;
-bool requestFinished = false;
 bool initialized = false;
 
 EventListener<web::WebTask> webRequest;
 
 void createButton(CCLayer* self, CCLabelBMFont* label, int levelID) {
     CCPoint position = { label->getPositionX() + 8.f, label->getPositionY() };
-    auto button = CCMenuItemSpriteExtra::create(label, self, nullptr);  // Không cần gọi hàm mở link
+    auto button = CCMenuItemSpriteExtra::create(label, self, menu_selector([](CCObject* ret) {
+        int levelID = static_cast<CCInteger*>(static_cast<CCNode*>(ret)->getUserObject())->getValue();
+        std::string url = "https://cps.ps.fhgdps.com/database/data/levels/" + std::to_string(levelID);
+        web::openLinkInBrowser(url.c_str());
+    }));
     auto menu = CCMenu::create();
     menu->setPosition(position);
     menu->addChild(button);
@@ -21,11 +24,10 @@ void createButton(CCLayer* self, CCLabelBMFont* label, int levelID) {
 }
 
 void getRequest(CCLayer* self, GJGameLevel* level, CCLabelBMFont* label) {
-    self->retain();
+    self->retain();  // Giữ lại self trong khi yêu cầu web chưa hoàn thành
     int levelID = level->m_levelID;
     std::string url = "https://cps.ps.fhgdps.com/database/demonlist.php?levelID=" + std::to_string(levelID);
 
-    // Web request handler
     webRequest.bind([self, label, levelID](web::WebTask::Event* e) {
         if (web::WebResponse* res = e->getValue()) {
             std::string result = res->string().unwrap();
@@ -53,7 +55,7 @@ class $modify(LevelInfoLayer) {
     bool init(GJGameLevel* level, bool idk) {
         if (!LevelInfoLayer::init(level, idk)) return false;
 
-        if (level->m_demon != 1) return true;
+        if (level->m_demon != 1) return true;  // Nếu không phải level demon, bỏ qua
 
         int offset = (level->m_coins == 0) ? 17 : 4;
         auto director = CCDirector::sharedDirector();
@@ -85,12 +87,10 @@ class $modify(MenuLayer) {
     bool init() {
         auto result = MenuLayer::init();
         if (initialized) return result;
-
         Loader* loader = Loader::get();
         if (loader->isModLoaded("gdutilsdevs.gdutils")) {
             loader->getLoadedMod("gdutilsdevs.gdutils")->setSettingValue<bool>("demonListPlacement", false);
         }
-
         initialized = true;
         return result;
     }
