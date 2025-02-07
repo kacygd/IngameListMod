@@ -7,14 +7,13 @@
 using namespace geode::prelude;
 
 std::unordered_map<int, int> cachedPositions;
-bool requestFinished = false;
 bool initialized = false;
 
 EventListener<web::WebTask> webRequest;
 
 void createButton(CCLayer* self, CCLabelBMFont* label, int levelID) {
     CCPoint position = { label->getPositionX() + 8.f, label->getPositionY() };
-    auto button = CCMenuItemSpriteExtra::create(label, self, nullptr); // No action required here
+    auto button = CCMenuItemSpriteExtra::create(label, self, nullptr);
     auto menu = CCMenu::create();
     auto trophy = CCSprite::createWithSpriteFrameName("rankIcon_top50_001.png");
     trophy->setScale(0.5f);
@@ -25,39 +24,25 @@ void createButton(CCLayer* self, CCLabelBMFont* label, int levelID) {
     self->addChild(menu);
 }
 
-void infoButton(CCLayer* layer, CCLabelBMFont* label, bool internetFail = false) {
-    CCPoint position = { label->getPositionX() - 122, label->getPositionY() - 81 };
-    auto buttonBg = CCSprite::createWithSpriteFrameName("GJ_infoIcon_001.png");
-    auto button = CCMenuItemSpriteExtra::create(buttonBg, layer, nullptr); // No action required here
-    auto menu = CCMenu::create();
-    menu->setScale(0.5f);
-    menu->addChild(button);
-    menu->setPosition(position);
-    layer->addChild(menu);
-}
-
 void getRequest(CCLayer* self, GJGameLevel* level, CCLabelBMFont* label) {
-    self->retain();
     int levelID = level->m_levelID;
     std::string url = "https://cps.ps.fhgdps.com/database/demonlist.php?levelID=" + std::to_string(levelID);
 
     webRequest.bind([self, label, levelID](web::WebTask::Event* e) {
         if (web::WebResponse* res = e->getValue()) {
             std::string result = res->string().unwrap();
-            int position = std::stoi(result);
-            if (position > 0) {
-                label->setString(std::to_string(position).c_str());
-                auto pos = CCInteger::create(levelID);
-                createButton(self, label, levelID);
-                cachedPositions.insert({ levelID, position });
-            } else {
-                label->setString("N/A"); // Directly show "N/A" when no rank is available
-                cachedPositions.insert({ levelID, -1 });
+            try {
+                int position = std::stoi(result);
+                cachedPositions[levelID] = (position > 0) ? position : -1;
+                label->setString((position > 0) ? std::to_string(position).c_str() : "N/A");
+                if (position > 0) createButton(self, label, levelID);
+            } catch (...) {
+                label->setString("N/A");
+                cachedPositions[levelID] = -1;
             }
-        } else if (e->isCancelled()) {
-            label->setString("???"); // Show "???" if the request fails
+        } else {
+            label->setString("???");
         }
-        self->autorelease();
     });
 
     auto req = web::WebRequest();
@@ -67,7 +52,6 @@ void getRequest(CCLayer* self, GJGameLevel* level, CCLabelBMFont* label) {
 class $modify(LevelInfoLayer) {
     bool init(GJGameLevel* level, bool idk) {
         if (!LevelInfoLayer::init(level, idk)) return false;
-
         if (level->m_demon != 1) return true;
 
         int offset = (level->m_coins == 0) ? 17 : 4;
@@ -80,13 +64,8 @@ class $modify(LevelInfoLayer) {
         label->setScale(0.5f);
 
         if (it != cachedPositions.end()) {
-            if (cachedPositions[level->m_levelID] > -1) {
-                int position = cachedPositions[level->m_levelID];
-                label->setString(std::to_string(position).c_str());
-                createButton(this, label, level->m_levelID);
-            } else {
-                label->setString("N/A"); // Directly show "N/A"
-            }
+            label->setString((it->second > -1) ? std::to_string(it->second).c_str() : "N/A");
+            if (it->second > -1) createButton(this, label, level->m_levelID);
         } else {
             getRequest(this, level, label);
         }
