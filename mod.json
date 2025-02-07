@@ -5,9 +5,8 @@
 		"win": "2.2074",
 		"android": "2.2074"
 	},
-	"id": "adyagd.ingamelistmod",
-	"name": "IngameListMod",
+	"id": "cps.adyagd.ingamelistmod",
+	"name": "CPS IngameListMod",
 	"developer": "AdyaGD",
-	"description": "Shows the position of a demon/challenge level in the list.",
-	"repository": "https://github.com/AdyaGMD/IngameListMod"
+	"description": "Shows the position of a demon level in cps demonlist.",
 }
