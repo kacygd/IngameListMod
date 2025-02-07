@@ -37,6 +37,7 @@ void createButton(CCLayer* self, CCLabelBMFont* label, int levelID, int rank) {
 
 
 void getRequest(CCLayer* self, GJGameLevel* level, CCLabelBMFont* label) {
+    self->retain();
     int levelID = level->m_levelID;
     std::string url = "https://cps.ps.fhgdps.com/database/demonlist.php?levelID=" + std::to_string(levelID);
 
@@ -45,16 +46,21 @@ void getRequest(CCLayer* self, GJGameLevel* level, CCLabelBMFont* label) {
             std::string result = res->string().unwrap();
             try {
                 int position = std::stoi(result);
-                cachedPositions[levelID] = (position > 0) ? position : -1;
-                label->setString((position > 0) ? std::to_string(position).c_str() : "N/A");
-                if (position > 0) createButton(self, label, levelID);
+                if (position > 0) {
+                    label->setString(std::to_string(position).c_str());
+                    createButton(self, label, levelID, position);
+                    cachedPositions.insert({ levelID, position });
+                } else {
+                    label->setString("N/A");
+                    cachedPositions.insert({ levelID, -1 });
+                }
             } catch (...) {
-                label->setString("N/A");
-                cachedPositions[levelID] = -1;
+                label->setString("???");
             }
         } else {
             label->setString("???");
         }
+        self->autorelease();
     });
 
     auto req = web::WebRequest();
