@@ -12,6 +12,11 @@ bool initialized = false;
 
 EventListener<web::WebTask> webRequest;
 
+void onButtonPressed(CCObject* sender) {
+    // Hàm callback khi bấm vào nút
+    CCLog("Button pressed!");
+}
+
 void createButton(CCLayer* self, CCLabelBMFont* label, int levelID, int rank) {
     CCPoint position = { label->getPositionX() + 8.f, label->getPositionY() };
 
@@ -25,7 +30,7 @@ void createButton(CCLayer* self, CCLabelBMFont* label, int levelID, int rank) {
     else if (rank <= 100) texture = "rankIcon_top1000_001.png";
     else texture = "rankIcon_all_001.png";
 
-    auto button = CCMenuItemSpriteExtra::create(label, self, nullptr);
+    auto button = CCMenuItemSpriteExtra::create(label, self, menu_selector(onButtonPressed));
     auto menu = CCMenu::create();
     auto trophy = CCSprite::createWithSpriteFrameName(texture.c_str());
     trophy->setScale(0.5f);
@@ -48,19 +53,19 @@ void getRequest(CCLayer* self, GJGameLevel* level, CCLabelBMFont* label) {
                 int position = std::stoi(result);
                 if (position > 0) {
                     label->setString(std::to_string(position).c_str());
-                    cachedPositions.insert({ levelID, position });
+                    cachedPositions[levelID] = position;
                     createButton(self, label, levelID, position);
                 } else {
                     label->setString("N/A");
-                    cachedPositions.insert({ levelID, -1 });
+                    cachedPositions[levelID] = -1;
                 }
-            } catch (...) {
+            } catch (const std::exception&) {
                 label->setString("???");
             }
-        } else if (e->isCancelled()) {
+        } else {
             label->setString("???");
         }
-        self->autorelease();
+        self->release();
     });
 
     auto req = web::WebRequest();
@@ -70,7 +75,6 @@ void getRequest(CCLayer* self, GJGameLevel* level, CCLabelBMFont* label) {
 class $modify(LevelInfoLayer) {
     bool init(GJGameLevel* level, bool idk) {
         if (!LevelInfoLayer::init(level, idk)) return false;
-
         if (level->m_demon != 1) return true;
 
         int offset = (level->m_coins == 0) ? 17 : 4;
@@ -83,10 +87,9 @@ class $modify(LevelInfoLayer) {
         label->setScale(0.5f);
 
         if (it != cachedPositions.end()) {
-            if (cachedPositions[level->m_levelID] > -1) {
-                int position = cachedPositions[level->m_levelID];
-                label->setString(std::to_string(position).c_str());
-                createButton(this, label, level->m_levelID, position);
+            if (it->second > -1) {
+                label->setString(std::to_string(it->second).c_str());
+                createButton(this, label, level->m_levelID, it->second);
             } else {
                 label->setString("N/A");
             }
