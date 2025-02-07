@@ -83,7 +83,7 @@ class $modify(LevelInfoLayer) {
 
         if (it != cachedPositions.end()) {
             label->setString((it->second > -1) ? std::to_string(it->second).c_str() : "N/A");
-            if (it->second > -1) createButton(this, label, level->m_levelID);
+            if (it->second > -1) createButton(this, label, level->m_levelID, it->second);
         } else {
             getRequest(this, level, label);
         }
