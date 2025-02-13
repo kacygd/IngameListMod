@@ -26,7 +26,7 @@ void createButton(CCLayer* self, CCLabelBMFont* label, int levelID) {
 
 void getRequest(CCLayer* self, GJGameLevel* level, CCLabelBMFont* label) {
     int levelID = level->m_levelID;
-    std::string url = "https://cps.ps.fhgdps.com/database/demonlist.php?levelID=" + std::to_string(levelID);
+    std::string url = "https://cps.ps.fhgdps.com/database/pos.php?levelID=" + std::to_string(levelID);
 
     webRequest.bind([self, label, levelID](web::WebTask::Event* e) {
         if (web::WebResponse* res = e->getValue()) {
