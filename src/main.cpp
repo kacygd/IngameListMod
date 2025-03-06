@@ -35,7 +35,9 @@ void getRequest(CCLayer* self, GJGameLevel* level, CCLabelBMFont* label) {
                 int position = std::stoi(result);
                 cachedPositions[levelID] = (position > 0) ? position : -1;
                 label->setString((position > 0) ? std::to_string(position).c_str() : "N/A");
-                if (position > 0) createButton(self, label, levelID);
+                if (position > 0 && (self->getUserData() == reinterpret_cast<void*>(3) || self->getUserData() == reinterpret_cast<void*>(4))) {
+                    createButton(self, label, levelID);
+                }
             } catch (...) {
                 label->setString("N/A");
                 cachedPositions[levelID] = -1;
@@ -54,6 +56,9 @@ class $modify(LevelInfoLayer) {
         if (!LevelInfoLayer::init(level, idk)) return false;
         if (level->m_demon != 1) return true;
 
+        int demonDifficulty = level->m_demonDifficulty;
+        if (demonDifficulty != 3 && demonDifficulty != 4) return true;
+
         int offset = (level->m_coins == 0) ? 17 : 4;
         auto director = CCDirector::sharedDirector();
         auto size = director->getWinSize();
@@ -63,9 +68,13 @@ class $modify(LevelInfoLayer) {
         label->setPosition({ size.width / 2 - 100, size.height / 2 + offset });
         label->setScale(0.5f);
 
+        this->setUserData(reinterpret_cast<void*>(demonDifficulty));
+
         if (it != cachedPositions.end()) {
             label->setString((it->second > -1) ? std::to_string(it->second).c_str() : "N/A");
-            if (it->second > -1) createButton(this, label, level->m_levelID);
+            if (it->second > -1) {
+                createButton(this, label, level->m_levelID);
+            }
         } else {
             getRequest(this, level, label);
         }
